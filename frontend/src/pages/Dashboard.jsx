@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
 function Dashboard() {
   const { user } = useAuth();
   const [expenses, setExpenses] = useState([]);
@@ -66,9 +66,7 @@ function Dashboard() {
     }
   };
 
-  const [budget, setBudget] = useState(
-    () => Number(localStorage.getItem('budget')) || 500
-  );
+  const [budget, setBudget] = useState(() => Number(localStorage.getItem('budget')) || 500);
 
   const handleBudgetChange = (e) => {
     const value = Number(e.target.value);
@@ -79,99 +77,151 @@ function Dashboard() {
   const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
   if (!user) {
-    return <h1 style={{ textAlign: 'center', marginTop: '3rem' }}>Please log in to view your dashboard.</h1>;
+    return (
+      <div className="mt-16 text-center text-xl font-semibold text-slate-700">
+        Please log in to view your dashboard.
+      </div>
+    );
   }
 
-  const categoryData = Object.values(
-    expenses.reduce((acc, exp) => {
-      if (!acc[exp.category]) acc[exp.category] = { name: exp.category, value: 0 };
-      acc[exp.category].value += exp.amount;
-      return acc;
-    }, {})
-  );
+  const percentUsed = budget > 0 ? Math.min((total / budget) * 100, 100) : 0;
 
-  const percentUsed = budget > 0
-    ? Math.min((total / budget) * 100, 100)
-    : 0;
-
-  const COLORS = ['#7F77DD', '#1D9E75', '#D85A30', '#E0B93D', '#4A90D9'];
   return (
-    <div style={{ maxWidth: '700px', margin: '2rem auto', padding: '1rem' }}>
-      <h1>Dashboard</h1>
-      <p><strong>Total spent:</strong> ${total}</p>
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-900">Welcome, {user.name}</h1>
+      </div>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: '2rem', border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
-        <h3>{editingId ? 'Edit Expense' : 'Add Expense'}</h3>
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={form.title}
-          onChange={handleChange}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
-        />
-        <input
-          type="number"
-          name="amount"
-          placeholder="Amount"
-          value={form.amount}
-          onChange={handleChange}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
-        />
-        <select
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-          style={{ display: 'block', width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
+      <div className="mb-6 grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl bg-slate-900 p-6 text-white shadow-sm">
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-300">Total spent</p>
+          <p className="mt-3 text-3xl font-bold">${total}</p>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <label htmlFor="budget" className="mb-2 block text-sm font-medium text-slate-700">
+            Monthly budget
+          </label>
+          <input
+            id="budget"
+            type="number"
+            min="0"
+            value={budget}
+            onChange={handleBudgetChange}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          />
+          <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+            <div
+              className="h-full rounded-full bg-emerald-500 transition-all"
+              style={{ width: `${percentUsed}%` }}
+            />
+          </div>
+          <p className="mt-2 text-sm text-slate-600">{Math.round(percentUsed)}% used</p>
+        </div>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+      >
+        <h3 className="mb-4 text-xl font-bold text-slate-900">
+          {editingId ? 'Edit Expense' : 'Add Expense'}
+        </h3>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <input
+            type="text"
+            name="title"
+            placeholder="Title"
+            value={form.title}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 md:col-span-2"
+          />
+          <input
+            type="number"
+            name="amount"
+            placeholder="Amount"
+            value={form.amount}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          />
+          <select
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          >
+            <option>Food</option>
+            <option>Travel</option>
+            <option>Rent</option>
+            <option>Entertainment</option>
+            <option>Other</option>
+          </select>
+          <input
+            type="date"
+            name="date"
+            value={form.date}
+            onChange={handleChange}
+            required
+            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 md:col-span-2"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="mt-5 rounded-lg bg-indigo-600 px-4 py-2.5 font-semibold text-white transition hover:bg-indigo-500"
         >
-          <option>Food</option>
-          <option>Travel</option>
-          <option>Rent</option>
-          <option>Entertainment</option>
-          <option>Other</option>
-        </select>
-        <input
-          type="date"
-          name="date"
-          value={form.date}
-          onChange={handleChange}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
-        />
-        <button type="submit" style={{ padding: '0.5rem 1rem' }}>
           {editingId ? 'Update' : 'Add'} Expense
         </button>
       </form>
 
-      <h3>Your Expenses</h3>
-      {expenses.length === 0 && <p>No expenses yet.</p>}
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '0.5rem' }}>Title</th>
-            <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '0.5rem' }}>Category</th>
-            <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '0.5rem' }}>Amount</th>
-            <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '0.5rem' }}>Date</th>
-            <th style={{ borderBottom: '1px solid #ccc', padding: '0.5rem' }}></th>
-          </tr>
-        </thead>
-        <tbody>
-          {expenses.map((exp) => (
-            <tr key={exp._id}>
-              <td style={{ padding: '0.5rem' }}>{exp.title}</td>
-              <td style={{ padding: '0.5rem' }}>{exp.category}</td>
-              <td style={{ padding: '0.5rem' }}>${exp.amount}</td>
-              <td style={{ padding: '0.5rem' }}>{new Date(exp.date).toISOString().slice(0, 10)}</td>
-              <td style={{ padding: '0.5rem' }}>
-                <button onClick={() => handleEdit(exp)} style={{ marginRight: '0.5rem' }}>Edit</button>
-                <button onClick={() => handleDelete(exp._id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h3 className="mb-4 text-xl font-bold text-slate-900">Your Expenses</h3>
+
+        {expenses.length === 0 ? (
+          <p className="text-slate-500">No expenses yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full border-separate border-spacing-y-2">
+              <thead>
+                <tr className="text-left text-sm text-slate-500">
+                  <th className="px-3 py-2 font-medium">Title</th>
+                  <th className="px-3 py-2 font-medium">Category</th>
+                  <th className="px-3 py-2 font-medium">Amount</th>
+                  <th className="px-3 py-2 font-medium">Date</th>
+                  <th className="px-3 py-2 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {expenses.map((exp) => (
+                  <tr key={exp._id} className="rounded-lg bg-slate-50 text-sm text-slate-700">
+                    <td className="rounded-l-lg px-3 py-3">{exp.title}</td>
+                    <td className="px-3 py-3">{exp.category}</td>
+                    <td className="px-3 py-3">${exp.amount}</td>
+                    <td className="px-3 py-3">{new Date(exp.date).toISOString().slice(0, 10)}</td>
+                    <td className="rounded-r-lg px-3 py-3 text-right">
+                      <button
+                        onClick={() => handleEdit(exp)}
+                        className="mr-2 rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(exp._id)}
+                        className="rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-100"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

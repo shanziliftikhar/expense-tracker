@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+
 function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ function Signup() {
   const { login } = useAuth();
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -23,16 +25,16 @@ function Signup() {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '3rem auto', padding: '1rem' }}>
-      <h1>Signup</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="mx-auto mt-16 max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h1 className="mb-6 text-2xl font-bold text-slate-900">Signup</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          style={{ display: 'block', width: '100%', marginBottom: '1rem', padding: '0.5rem' }}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
         />
         <input
           type="email"
@@ -40,7 +42,7 @@ function Signup() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ display: 'block', width: '100%', marginBottom: '1rem', padding: '0.5rem' }}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
         />
         <input
           type="password"
@@ -48,10 +50,15 @@ function Signup() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          style={{ display: 'block', width: '100%', marginBottom: '1rem', padding: '0.5rem' }}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
         />
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" style={{ padding: '0.5rem 1rem' }}>Signup</button>
+        {error && <p className="text-sm font-medium text-red-600">{error}</p>}
+        <button
+          type="submit"
+          className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 font-semibold text-white transition hover:bg-indigo-500"
+        >
+          Signup
+        </button>
       </form>
     </div>
   );

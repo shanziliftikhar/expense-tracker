@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useAuth();
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -15,22 +17,22 @@ function Login() {
       const { token, user } = response.data;
       login(token, user);
       navigate('/');
-    }catch(err){
-      setError(err.response?.data?.message ||'Login failed')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '3rem auto', padding: '1rem' }}>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="mx-auto mt-16 max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h1 className="mb-6 text-2xl font-bold text-slate-900">Login</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ display: 'block', width: '100%', marginBottom: '1rem', padding: '0.5rem' }}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
         />
         <input
           type="password"
@@ -38,10 +40,15 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          style={{ display: 'block', width: '100%', marginBottom: '1rem', padding: '0.5rem' }}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
         />
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" style={{ padding: '0.5rem 1rem' }}>Login</button>
+        {error && <p className="text-sm font-medium text-red-600">{error}</p>}
+        <button
+          type="submit"
+          className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 font-semibold text-white transition hover:bg-indigo-500"
+        >
+          Login
+        </button>
       </form>
     </div>
   );
